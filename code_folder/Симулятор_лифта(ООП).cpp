@@ -7,6 +7,86 @@
 
 using namespace std;
 
+// Класс двери
+class Door {
+private:
+    bool isOpen;
+
+public:
+    Door() : isOpen(false) {}
+
+    void move() {
+        int doorPosition = isOpen ? 100 : 0;
+        int step = isOpen ? -1 : 1;
+
+        while ((isOpen && doorPosition > 0) || (!isOpen && doorPosition < 100)) {
+            doorPosition += step;
+            this_thread::sleep_for(chrono::milliseconds(40));
+        }
+
+        isOpen = !isOpen;
+        cout << (isOpen ? "Двери лифта открылись" : "Двери лифта закрылись") << endl;
+    }
+
+    bool isDoorOpen() const {
+        return isOpen;
+    }
+};
+
+// Класс лифта
+class Elevator {
+private:
+    double diameterOfTheWhinchDrum;
+    double floorHeight;
+    int currentFloor;
+    int totalFloors;
+
+public:
+    // Конструктор по умолчанию
+    Elevator() : diameterOfTheWhinchDrum(0.2), floorHeight(3.0), currentFloor(1), totalFloors(15) {}
+
+    Elevator(double diameter, double height, int floors, int startFloor)
+        : diameterOfTheWhinchDrum(diameter), floorHeight(height), totalFloors(floors), currentFloor(startFloor) {}
+
+    int move(int targetFloor) {
+        double degreeNeedFor1Floor = (floorHeight / (M_PI * diameterOfTheWhinchDrum)) * 360;
+        double degreeNeed = degreeNeedFor1Floor * (targetFloor - currentFloor);
+        double curDeg = 0;
+        int timeood = 1160000;
+
+        if (targetFloor > currentFloor) {
+            for (int i = currentFloor; i < targetFloor; i++) {
+                curDeg += degreeNeedFor1Floor;
+                this_thread::sleep_for(chrono::nanoseconds(timeood));
+                cout << "Лифт сейчас на " << ++currentFloor << " этаже." << endl;
+            }
+        } else {
+            for (int i = currentFloor; i > targetFloor; i--) {
+                curDeg -= degreeNeedFor1Floor;
+                this_thread::sleep_for(chrono::nanoseconds(timeood));
+                cout << "Лифт сейчас на " << --currentFloor << " этаже." << endl;
+            }
+        }
+        return currentFloor;
+    }
+
+    int getCurrentFloor() const {
+        return currentFloor;
+    }
+
+    void setTotalFloors(int floors) {
+        totalFloors = floors;
+    }
+
+    void setDiameter(double diameter) {
+        diameterOfTheWhinchDrum = diameter;
+    }
+
+    void setFloorHeight(double height) {
+        floorHeight = height;
+    }
+};
+
 // Интерфейс команды
 class Command {
 public:
@@ -50,81 +130,6 @@ public:
 
     void execute() override {
         elevator.move(targetFloor);
-    }
-};
-
-class Door {
-private:
-    bool isOpen;
-
-public:
-    Door() : isOpen(false) {}
-
-    void move() {
-        int doorPosition = isOpen ? 100 : 0;
-        int step = isOpen ? -1 : 1;
-
-        while ((isOpen && doorPosition > 0) || (!isOpen && doorPosition < 100)) {
-            doorPosition += step;
-            this_thread::sleep_for(chrono::milliseconds(40));
-        }
-
-        isOpen = !isOpen;
-        cout << (isOpen ? "Двери лифта открылись" : "Двери лифта закрылись") << endl;
-    }
-
-    bool isDoorOpen() const {
-        return isOpen;
-    }
-};
-
-class Elevator {
-private:
-    double diameterOfTheWhinchDrum;
-    double floorHeight;
-    int currentFloor;
-    int totalFloors;
-
-public:
-    Elevator(double diameter, double height, int floors, int startFloor)
-        : diameterOfTheWhinchDrum(diameter), floorHeight(height), totalFloors(floors), currentFloor(startFloor) {}
-
-    int move(int targetFloor) {
-        double degreeNeedFor1Floor = (floorHeight / (M_PI * diameterOfTheWhinchDrum)) * 360;
-        double degreeNeed = degreeNeedFor1Floor * (targetFloor - currentFloor);
-        double curDeg = 0;
-        int timeood = 1160000;
-
-        if (targetFloor > currentFloor) {
-            for (int i = currentFloor; i < targetFloor; i++) {
-                curDeg += degreeNeedFor1Floor;
-                this_thread::sleep_for(chrono::nanoseconds(timeood));
-                cout << "Лифт сейчас на " << ++currentFloor << " этаже." << endl;
-            }
-        } else {
-            for (int i = currentFloor; i > targetFloor; i--) {
-                curDeg -= degreeNeedFor1Floor;
-                this_thread::sleep_for(chrono::nanoseconds(timeood));
-                cout << "Лифт сейчас на " << --currentFloor << " этаже." << endl;
-            }
-        }
-        return currentFloor;
-    }
-
-    int getCurrentFloor() const {
-        return currentFloor;
-    }
-
-    void setTotalFloors(int floors) {
-        totalFloors = floors;
-    }
-
-    void setDiameter(double diameter) {
-        diameterOfTheWhinchDrum = diameter;
-    }
-
-    void setFloorHeight(double height) {
-        floorHeight = height;
     }
 };
 
@@ -261,4 +266,3 @@ int main() {
 
     return 0;
 }
-
