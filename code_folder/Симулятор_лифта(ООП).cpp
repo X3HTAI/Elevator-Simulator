@@ -25,7 +25,7 @@ public:
         }
 
         isOpen = !isOpen;
-        cout << (isOpen ? "Двери лифта открылись" : "Двери лифта закрылись") << endl;
+        cout << (isOpen ? "Двери лифта закрылись" : "Двери лифта открылись") << endl;
     }
 
     bool isDoorOpen() const {
@@ -33,6 +33,7 @@ public:
     }
 };
 
+// Класс лифта
 // Класс лифта
 class Elevator {
 private:
@@ -48,21 +49,71 @@ public:
     Elevator(double diameter, double height, int floors, int startFloor)
         : currentFloor(startFloor), totalFloors(floors), diameterOfTheWhinchDrum(diameter), floorHeight(height) {}
 
-    int move(int targetFloor) {
+    int elevator_move(int eof, int nofb) {
         double degreeNeedFor1Floor = (floorHeight / (M_PI * diameterOfTheWhinchDrum)) * 360;
+        double degreeNeed = degreeNeedFor1Floor * nofb;
+        double curDeg = 0;
+        int idnf1f = degreeNeedFor1Floor;
+
+        double dtnf = degreeNeedFor1Floor;
+
         int timeood = 1160000;
 
-        if (targetFloor > currentFloor) {
-            for (int i = currentFloor; i < targetFloor; i++) {
+        if (nofb > 0) {
+            if (idnf1f != degreeNeedFor1Floor) {
+                double fod = degreeNeedFor1Floor - idnf1f;
+                timeood *= fod;
+                for (int i = 0; i < nofb; i++) {
+                    curDeg += fod;
+                    if (curDeg >= dtnf) {
+                        eof += 1;
+                        cout << "Лифт сейчас на " << eof << " этаже." << endl;
+                        dtnf += degreeNeedFor1Floor;
+                    }
+                    this_thread::sleep_for(chrono::nanoseconds(timeood));
+                }
+            }
+            timeood = 1160000;
+            while (curDeg != degreeNeed) {
+                curDeg += 1;
+                if (curDeg >= dtnf) {
+                    eof += 1;
+                    cout << "Лифт сейчас на " << eof << " этаже." << endl;
+                    dtnf += degreeNeedFor1Floor;
+                }
                 this_thread::sleep_for(chrono::nanoseconds(timeood));
-                cout << "Лифт сейчас на " << ++currentFloor << " этаже." << endl;
             }
         } else {
-            for (int i = currentFloor; i > targetFloor; i--) {
+            if (idnf1f != degreeNeedFor1Floor) {
+                double fod = degreeNeedFor1Floor - idnf1f;
+                timeood *= fod;
+                for (int i = 0; i > nofb; i--) {
+                    curDeg -= fod;
+                    if (abs(curDeg) >= dtnf) {
+                        eof -= 1;
+                        cout << "Лифт сейчас на " << eof << " этаже." << endl;
+                        dtnf += degreeNeedFor1Floor;
+                    }
+                    this_thread::sleep_for(chrono::nanoseconds(timeood));
+                }
+            }
+            timeood = 1160000;
+            while (curDeg != degreeNeed) {
+                curDeg -= 1;
+                if (abs(curDeg) >= dtnf) {
+                    eof -= 1;
+                    cout << "Лифт сейчас на " << eof << " этаже." << endl;
+                    dtnf += degreeNeedFor1Floor;
+                }
                 this_thread::sleep_for(chrono::nanoseconds(timeood));
-                cout << "Лифт сейчас на " << --currentFloor << " этаже." << endl;
             }
         }
+        return eof;
+    }
+
+    int move(int targetFloor) {
+        int nofb = targetFloor - currentFloor; // Количество этажей для перемещения
+        currentFloor = elevator_move(currentFloor, nofb); // Используем вашу функцию для перемещения лифта
         return currentFloor;
     }
 
@@ -82,6 +133,7 @@ public:
         floorHeight = height;
     }
 };
+
 
 
 // Интерфейс команды
